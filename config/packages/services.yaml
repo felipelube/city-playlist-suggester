@@ -1,4 +1,0 @@
-services:
-  App\Services\LocationTemperatureGetter:
-    arguments:
-        $owmAppId: '%env(resolve:OWM_APPID)%'

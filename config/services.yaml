@@ -29,3 +29,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Services\LocationTemperatureGetter:
+        arguments:
+            $owmAppId: '%env(resolve:OWM_APPID)%'
+
+    App\Services\SpotifyPlaylistGetter:
+        arguments:
+            $clientId: '%env(resolve:SPOTIFY_CLIENT_ID)%'
+            $clientSecret: '%env(resolve:SPOTIFY_CLIENT_SECRET)%'
