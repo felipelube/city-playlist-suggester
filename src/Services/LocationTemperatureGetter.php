@@ -2,13 +2,12 @@
 
 namespace App\Services;
 use Cmfcmf\OpenWeatherMap;
-use Cmfcmf\OpenWeatherMap\Exception as CmfcmfException;
 use Cmfcmf\OpenWeatherMap\NotFoundException;
-use PhpParser\Node\Expr\Instanceof_;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class LocationTemperatureGetter {
   /**
@@ -16,8 +15,15 @@ class LocationTemperatureGetter {
    */
   private $owm;
 
-  public function __construct($owmAppId, ClientInterface $httpClient, RequestFactoryInterface $requestFactory) {
+  /**
+   * @var AdapterInterface
+   */
+  private $cache;
+
+  public function __construct($owmAppId, ClientInterface $httpClient, RequestFactoryInterface $requestFactory, AdapterInterface $cache) {
+
     $this->owm = new OpenWeatherMap($owmAppId, $httpClient, $requestFactory);
+    $this->cache = $cache;
   }
   /**
        * Encapsule esta exceção lançada pela biblioteca
@@ -37,8 +43,12 @@ class LocationTemperatureGetter {
     }
     //FIXME: de quem é a resposabilidade de encapsular as exceções da biblioteca? Esta classe ou o controller?
     try {
-      $weather = $this->owm->getWeather($cityName, "metric", "pt_br");
-      return $weather->temperature->now->getValue();
+      //TODO: normalizar o parâmetro cityName para ser usado como chave no cache
+      return $this->cache->get("city-$cityName", function(ItemInterface $item) use ($cityName) {
+        $weather = $this->owm->getWeather($cityName, "metric", "pt_br");
+        $item->expiresAfter(600); //TODO: parametrizar
+        return $weather->temperature->now->getValue();
+      });
     } catch(NotFoundException $e) {
       throw new HttpException(404, "Cidade não encontrada", $e);
     } catch(\InvalidArgumentException $e)  {
