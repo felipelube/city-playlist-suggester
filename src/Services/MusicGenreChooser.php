@@ -20,7 +20,7 @@ class MusicGenreChooser {
      */
     if (!is_numeric($temperature)) {
       throw new \InvalidArgumentException(
-        "chooseGenreFromTemperature somente aceita valores numéricos de temperatura"
+        "chooseGenreFromTemperature: informe um valor numérico para a temperatura"
       );
     }
     if ($temperature > 30)   {
