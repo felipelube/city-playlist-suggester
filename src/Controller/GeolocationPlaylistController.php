@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Services\Normalizers\GeolocationNormalizer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,7 +15,8 @@ class GeolocationPlaylistController extends PlaylistController
     {
         $latitude = $request->query->get('lat');
         $longitude = $request->query->get('lon');
-        $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByLocation($latitude, $longitude);
+        list($normalizedLatitude, $normalizedLongitude) = GeolocationNormalizer::normalize($latitude, $longitude);
+        $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByLocation($normalizedLatitude, $normalizedLongitude);
 
         return $this->makeResponseFromTemperature($temperature);
     }
