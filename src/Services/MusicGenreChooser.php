@@ -18,8 +18,7 @@ class MusicGenreChooser
          *  * Se a temperatura (Celsius) estiver acima de 30 graus, sugerir músicas para festa
             * Se a temperatura está entre 15 e 30 graus, sugerir músicas do gênero Pop.
             * Entre 10 e 14 graus, sugerir músicas do gênero Rock
-            * Abaixo de 10 graus, segerir músicas clássicas.
-            TODO: remover estaticidade
+            * Abaixo de 10 graus, sugerir músicas clássicas.
          */
         if (!is_numeric($temperature)) {
             throw new \InvalidArgumentException('chooseGenreFromTemperature: informe um valor numérico para a temperatura');

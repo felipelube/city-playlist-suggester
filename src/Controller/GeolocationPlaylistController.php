@@ -2,19 +2,20 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class GeolocationPlaylistController extends AbstractController
+class GeolocationPlaylistController extends PlaylistController
 {
     /**
-     * @Route("/geolocation/playlist", name="geolocation_playlist")
+     * @Route("/localizacao", name="location_playlist")
      */
-    public function index()
+    public function getPlaylistForLocation(Request $request)
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/GeolocationPlaylistController.php',
-        ]);
+        $latitude = $request->query->get('lat');
+        $longitude = $request->query->get('lon');
+        $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByLocation($latitude, $longitude);
+
+        return $this->makeResponseFromTemperature($temperature);
     }
 }
