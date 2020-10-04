@@ -7,8 +7,10 @@ namespace App\Services\Normalizers;
  */
 class CityNameNormalizer
 {
+    const TRANSLITERATOR = 'Any-Latin; Latin-ASCII; Lower()';
+
     public static function normalize($name)
     {
-        return \transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $name);
+        return \transliterator_transliterate(self::TRANSLITERATOR, $name);
     }
 }
