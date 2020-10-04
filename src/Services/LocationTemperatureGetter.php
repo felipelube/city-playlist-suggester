@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Normalizers\CityNameNormalizer;
 use Cmfcmf\OpenWeatherMap;
 use Cmfcmf\OpenWeatherMap\NotFoundException;
 use Psr\Http\Client\ClientInterface;
@@ -43,9 +44,10 @@ class LocationTemperatureGetter
         }
         //FIXME: de quem é a resposabilidade de encapsular as exceções da biblioteca? Esta classe ou o controller?
         try {
-            //TODO: normalizar o parâmetro cityName para ser usado como chave no cache
-            return $this->cache->get("city-$cityName", function (ItemInterface $item) use ($cityName) {
-                $weather = $this->owm->getWeather($cityName, 'metric', 'pt_br');
+            $normalizedName = CityNameNormalizer::normalize($cityName);
+
+            return $this->cache->get("city-$normalizedName", function (ItemInterface $item) use ($normalizedName) {
+                $weather = $this->owm->getWeather($normalizedName, 'metric', 'pt_br'); //TODO: parametrizar?
                 $item->expiresAfter(600); //TODO: parametrizar
 
                 return $weather->temperature->now->getValue();
