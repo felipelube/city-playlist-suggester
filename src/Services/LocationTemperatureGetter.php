@@ -65,7 +65,6 @@ class LocationTemperatureGetter
 
     public function getTemperatureFromCityByLocation($latitude, $longitude)
     {
-        // TODO: usar um cache
         try {
             if (!is_numeric($latitude) || !is_numeric($longitude)) {
                 throw new \InvalidArgumentException('getTemperatureFromCityByLocation: informe valores numéricos para latitude e longitude em graus decimais');
@@ -78,9 +77,13 @@ class LocationTemperatureGetter
                     throw new \InvalidArgumentException('getTemperatureFromCityByLocation: valor inválido informado para a longitude');
                 }
             }
-            $weather = $this->owm->getWeather(['lat' => $latitude, 'lon' => $longitude], 'metric', 'pt_br');
 
-            return $weather->temperature->now->getValue();
+            return $this->cache->get("geo-$latitude, $longitude", function (ItemInterface $item) use ($latitude, $longitude) {
+                $weather = $this->owm->getWeather(['lat' => $latitude, 'lon' => $longitude], 'metric', 'pt_br');
+                $item->expiresAfter(600); //TODO: parametrizar
+
+                return $weather->temperature->now->getValue();
+            });
         } catch (\InvalidArgumentException $e) {
             throw new InvalidInputException($e->getMessage(), 400, $e);
         }
