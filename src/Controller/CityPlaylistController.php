@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Services\LocationTemperatureGetter;
 use App\Services\MusicGenreChooser;
 use App\Services\SpotifyPlaylistGetter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 class CityPlaylistController extends AbstractController
 {
@@ -32,11 +32,12 @@ class CityPlaylistController extends AbstractController
         $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByName($name);
         $genre = $this->musicGenreChooser::chooseGenreFromTemperature($temperature);
         $playlist = $this->playlistGetter->getPlaylistForGenre($genre);
+
         return $this->json([
             'cidade' => $name,
             'temperatura' => $temperature,
             'gênero musical' => $genre,
-            'playlist' => $playlist
+            'playlist' => $playlist,
         ]);
     }
 }
