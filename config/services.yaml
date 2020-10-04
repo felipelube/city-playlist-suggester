@@ -33,7 +33,7 @@ services:
         arguments:
             $owmAppId: '%env(resolve:OWM_APPID)%'
 
-    App\Services\SpotifyPlaylistGetter:
+    App\Services\SpotifyClient:
         arguments:
             $clientId: '%env(resolve:SPOTIFY_CLIENT_ID)%'
             $clientSecret: '%env(resolve:SPOTIFY_CLIENT_SECRET)%'
