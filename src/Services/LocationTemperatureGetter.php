@@ -10,33 +10,66 @@ use Cmfcmf\OpenWeatherMap\NotFoundException as OWMNotFoundException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ * Serviço para busca de temperatura utilizando a API do OpenWeatherMap (https://openweathermap.org/api).
+ * Caracterísicas:
+ * - Permite a busca por nome de cidade e coordenadas geográficas.
+ * - Utiliza a biblioteca Cmfcmf\OpenWeatherMap para fazer as requisições.
+ * - Utilização de cache para evitar o uso excessivo da API.
+ */
 class LocationTemperatureGetter
 {
     /**
+     * O cliente da API OpenWeatherMap.
+     *
      * @var OpenWeatherMap
      */
     private $owm;
 
     /**
+     * Uma implementação de um adaptador de contrato de cache do Symfony.
+     *
      * @var AdapterInterface
      */
     private $cache;
 
-    public function __construct($owmAppId, ClientInterface $httpClient, RequestFactoryInterface $requestFactory, AdapterInterface $cache)
-    {
-        $this->owm = new OpenWeatherMap($owmAppId, $httpClient, $requestFactory);
+    /**
+     * Constrói uma instância do serviço LocationTemperatureGetter.
+     *
+     * @param string                  $owmAppId       ID de aplicativo (API Key) necessário para utilização da API
+     * @param ClientInterface         $httpClient     Uma implementação de cliente HTTP (PSR-18)
+     * @param RequestFactoryInterface $requestFactory Uma implementação de fábrica de requisições (PSR-17)
+     * @param AdapterInterface        $cache          Um adaptador de cache do Symfony
+     *
+     * @throws InvalidInputException
+     */
+    public function __construct(
+        string $owmAppId,
+        ClientInterface $httpClient,
+        RequestFactoryInterface $requestFactory,
+        AdapterInterface $cache
+    ) {
+        try {
+            $this->owm = new OpenWeatherMap($owmAppId, $httpClient, $requestFactory);
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidInputException('LocationTemperatureGetter: falha na criação do cliente OpenWeather. Você passou uma chave de API válida?', 400, $e);
+        }
         $this->cache = $cache;
     }
 
     /**
-     * Encapsule esta exceção lançada pela biblioteca
-     * numa HttpException, que poderá ser tratada pelo
-     * Symfony mais acima.
+     * Pega a temperatura de uma cidade pelo seu nome.
+     *
+     * @param string $cityName O nome da cidade
+     *
+     * @return float A temperatura em graus celsius
+     *
+     * @throws InvalidInputException
+     * @throws NotFoundException
      */
-    public function getTemperatureFromCityByName($cityName)
+    public function getTemperatureFromCityByName(string $cityName)
     {
         try {
             if (!is_string($cityName)) {
@@ -63,6 +96,17 @@ class LocationTemperatureGetter
         }
     }
 
+    /**
+     * Pega a temperatura de uma cidade pela sua localização geográfica.
+     * Retorna uma temperatura já foi calculada do cache; caso não haja cache, busca essa informação na API
+     * do OpenWeatherMap, salva ela no cache para pesquisas rápidos no futuro e retorna a temperatura.
+     *
+     * @param string $cityName O nome da cidade
+     *
+     * @return float A temperatura em graus celsius
+     *
+     * @throws InvalidInputException
+     */
     public function getTemperatureFromCityByLocation($latitude, $longitude)
     {
         try {
