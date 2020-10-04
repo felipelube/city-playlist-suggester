@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use App\Exception\InvalidInputException;
 use App\Services\MusicGenreChooser;
 use PHPUnit\Framework\TestCase;
 
@@ -66,13 +67,13 @@ class MusicGenreChooserTest extends TestCase
 
     public function testWithNonNumericValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         MusicGenreChooser::chooseGenreFromTemperature('abacate');
     }
 
     public function testWithEmptyValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         MusicGenreChooser::chooseGenreFromTemperature('');
     }
 }

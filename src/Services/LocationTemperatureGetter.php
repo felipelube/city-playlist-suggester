@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Exception\InvalidInputException;
+use App\Exception\NotFoundException;
 use App\Services\Normalizers\CityNameNormalizer;
 use Cmfcmf\OpenWeatherMap;
-use Cmfcmf\OpenWeatherMap\NotFoundException;
+use Cmfcmf\OpenWeatherMap\NotFoundException as OWMNotFoundException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -36,20 +38,14 @@ class LocationTemperatureGetter
      */
     public function getTemperatureFromCityByName($cityName)
     {
-        if (!is_string($cityName)) {
-            throw new \InvalidArgumentException('getTemperatureFromCityByName: tipo de valor inválido para cityName');
-        }
-        if (empty($cityName)) {
-            throw new \InvalidArgumentException('getTemperatureFromCityByName: informe o nome da cidade');
-        }
-        /*
-            FIXME: de quem é a resposabilidade de encapsular as exceções da biblioteca? Esta classe ou o controller?
-            RESPOSTA: é o controller que deverá lançar outras exceções, pois este código pode ser usado em outro contexto
-            como um comando numa CLI. Idealmente, eu deveria criar minhas própriax exceções customizadas para este
-            serviço.
-        */
-
         try {
+            if (!is_string($cityName)) {
+                throw new \InvalidArgumentException('getTemperatureFromCityByName: tipo de valor inválido para cityName');
+            }
+            if (empty($cityName)) {
+                throw new \InvalidArgumentException('getTemperatureFromCityByName: informe o nome da cidade');
+            }
+
             //FIXME: este normalizador deve ser utilizado no controller
             $normalizedName = CityNameNormalizer::normalize($cityName);
 
@@ -60,10 +56,10 @@ class LocationTemperatureGetter
                 return $weather->temperature->now->getValue();
                 //TODO: uma entrada com as coordenadas da cidade deve ser criada também?
             });
-        } catch (NotFoundException $e) {
-            throw new HttpException(404, 'Cidade não encontrada', $e);
+        } catch (OWMNotFoundException $e) {
+            throw new NotFoundException($e->getMessage(), 404, $e);
         } catch (\InvalidArgumentException $e) {
-            throw new HttpException(400, "Parâmetros inválidos:\n{$e->getMessage()}", $e);
+            throw new InvalidInputException($e->getMessage(), 400, $e);
         }
     }
 
@@ -83,10 +79,10 @@ class LocationTemperatureGetter
                 }
             }
             $weather = $this->owm->getWeather(['lat' => $latitude, 'lon' => $longitude], 'metric', 'pt_br');
-        } catch (\InvalidArgumentException $e) {
-            throw new HttpException(400, "Parâmetros inválidos:\n{$e->getMessage()}", $e);
-        }
 
-        return $weather->temperature->now->getValue();
+            return $weather->temperature->now->getValue();
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidInputException($e->getMessage(), 400, $e);
+        }
     }
 }

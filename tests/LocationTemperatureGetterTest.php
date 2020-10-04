@@ -2,10 +2,12 @@
 
 namespace App\Tests;
 
+use App\Exception\InvalidInputException;
 use App\Services\LocationTemperatureGetter;
 use Cmfcmf\OpenWeatherMap\Tests\TestHttpClient;
 use Http\Factory\Guzzle\RequestFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class LocationTemperatureGetterTest extends KernelTestCase
 {
@@ -22,18 +24,18 @@ class LocationTemperatureGetterTest extends KernelTestCase
          * pela biblioteca OpenWeatherMap em seus testes, de forma a evitar requisições
          * verdadeiras à API.
          */
-        $this->service = new LocationTemperatureGetter('teste', new TestHttpClient(), new RequestFactory());
+        $this->service = new LocationTemperatureGetter('teste', new TestHttpClient(), new RequestFactory(), new ArrayAdapter());
     }
 
     public function testGetTemperatureFromCityByNameWithEmptyString()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $this->service->getTemperatureFromCityByName('');
     }
 
     public function testGetTemperatureFromCityByNameWithWrongType()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $this->service->getTemperatureFromCityByName(0);
     }
 
@@ -45,19 +47,19 @@ class LocationTemperatureGetterTest extends KernelTestCase
 
     public function testGetTemperatureFromCityByLocationWithUnsupportedFormat()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $this->service->getTemperatureFromCityByLocation('41 25 01N', '120 58 57W');
     }
 
     public function testGetTemperatureFromCityByLocationInvalidLatitudeValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $this->service->getTemperatureFromCityByLocation('-90.1', '10');
     }
 
     public function testGetTemperatureFromCityByLocationInvalidLongitudeValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $this->service->getTemperatureFromCityByLocation(0, 180.2);
     }
 

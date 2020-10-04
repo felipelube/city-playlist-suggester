@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Exception\InvalidInputException;
+
 class MusicGenreChooser
 {
     /**
@@ -21,7 +23,7 @@ class MusicGenreChooser
             * Abaixo de 10 graus, sugerir músicas clássicas.
          */
         if (!is_numeric($temperature)) {
-            throw new \InvalidArgumentException('chooseGenreFromTemperature: informe um valor numérico para a temperatura');
+            throw new InvalidInputException('chooseGenreFromTemperature: informe um valor numérico para a temperatura');
         }
         if ($temperature > 30) {
             return self::PARTY;
