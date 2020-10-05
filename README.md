@@ -1,4 +1,4 @@
-# Sugestão de playlist com base em temperatura de ciddade
+# Sugestão de playlist com base em temperatura de cidade
 
 Este repositório é a implementação de um desafio proposto para uma vaga de emprego, conforme abaixo:
 
