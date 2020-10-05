@@ -76,9 +76,6 @@ class LocationTemperatureGetter
     public function getTemperatureFromCityByName(string $cityName)
     {
         try {
-            if (!is_string($cityName)) {
-                throw new \InvalidArgumentException('getTemperatureFromCityByName: tipo de valor inválido para cityName');
-            }
             if (empty($cityName)) {
                 throw new \InvalidArgumentException('getTemperatureFromCityByName: informe o nome da cidade');
             }
