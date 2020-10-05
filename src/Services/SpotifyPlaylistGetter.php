@@ -16,7 +16,7 @@ class SpotifyPlaylistGetter
      *
      * @var SpotifyClient
      */
-    private $httpClient;
+    private $spotifyClient;
 
     /**
      * Uma implementação de um adaptador de contrato de cache do Symfony.
@@ -30,17 +30,16 @@ class SpotifyPlaylistGetter
     /**
      * Constrói uma instância do serviço SpotifyPlaylistGetter.
      *
-
-     * @param SpotifyClient    $httpClient O cliente para a API do Spotify
+     * @param SpotifyClient    $spotifyClient O cliente para a API do Spotify
      * @param AdapterInterface $cache      uma implementação de um adaptador de contrato de cache do Symfony
      *
      * @throws InvalidInputException
      */
     public function __construct(
-        SpotifyClient $httpClient,
+        SpotifyClient $spotifyClient,
         AdapterInterface $cache
     ) {
-        $this->httpClient = $httpClient;
+        $this->spotifyClient = $spotifyClient;
         $this->cache = $cache;
     }
 
@@ -56,7 +55,7 @@ class SpotifyPlaylistGetter
     {
         // TODO: usar uma resposta cacheada apenas como último recurso ou reduzir o TTL do cache
         return $this->cache->get("genre-$genre", function (ItemInterface $item) use ($genre) {
-            $response = $this->httpClient->authenticatedRequest('GET', self::SPOTIFY_RECOMMENDATIONS_ENDPOINT, [
+            $response = $this->spotifyClient->authenticatedRequest('GET', self::SPOTIFY_RECOMMENDATIONS_ENDPOINT, [
                 'query' => [
                     'seed_genres' => $genre,
                     'target_popularity' => 70,
