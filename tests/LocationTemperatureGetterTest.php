@@ -79,7 +79,39 @@ class LocationTemperatureGetterTest extends KernelTestCase
     public function testCityNotFound() {
         $this->markTestIncomplete(
             'Teste não implementado ainda.'
-          );
+        );
+    }
+
+    /**
+     * Testa se repetidas solicitações para a mesma cidade são servidas pelo
+     * cache a partir da primeira computação.
+     */
+    public function testCachedResponseForCity() {
+        $this->markTestIncomplete(
+            'Teste não implementado ainda.'
+        );
+    }
+
+
+    /**
+     * Testa se repetidas solicitações para a mesma localização geográfica são servidas pelo
+     * cache a partir da primeira computação.
+     */
+    public function testCachedResponseForSameGeographicCoordinates() {
+        $this->markTestIncomplete(
+            'Teste não implementado ainda.'
+        );
+    }
+
+    /**
+     * Testa se repetidas solicitações para a mesma localização geográfica são servidas pelo
+     * cache a partir da primeira computação.
+     * Verifica se mudanças infinitesimais nas coordenadas NÃO causam recomputação das mesmas.
+     */
+    public function testCachedResponseForSmallChangesInTheSameGeographicCoordinates() {
+        $this->markTestIncomplete(
+            'Teste não implementado ainda.'
+        );
     }
 
 
