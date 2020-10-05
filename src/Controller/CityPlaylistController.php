@@ -6,6 +6,7 @@ use App\Exception\InvalidInputException;
 use App\Exception\NotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Services\Normalizers\CityNameNormalizer;
 
 class CityPlaylistController extends PlaylistController
 {
@@ -15,7 +16,8 @@ class CityPlaylistController extends PlaylistController
     public function getPlaylistForCity($name)
     {
         try {
-            $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByName($name);
+            $normalizedName = CityNameNormalizer::normalize($name);
+            $temperature = $this->locationTemperatureGetter->getTemperatureFromCityByName($normalizedName);
         } catch (NotFoundException $e) {
             throw new HttpException(404, 'Cidade não encontrada', $e);
         } catch (InvalidInputException $e) {
