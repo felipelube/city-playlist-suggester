@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exception\InvalidInputException;
+use STS\Backoff\Backoff;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -40,9 +41,13 @@ class SpotifyClient
     private $cache;
 
     // Endpoint para geração/regeneração de tokens de acesso
-    const SPOTIFY_ACCESS_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
+    public const SPOTIFY_ACCESS_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
     // Tipo de autorização para geração de token de acesso no fluxo Client Credentials
-    const SPOTIFY_GRANT_TYPE = 'client_credentials';
+    public const SPOTIFY_GRANT_TYPE = 'client_credentials';
+    // o nome da chave no cache a qual guardará o token de acesso
+    public const CACHE_ACCESS_TOKEN_KEY = 'spotify_access_token';
+    // número máximo de tentativas de conexão com a API
+    public const MAX_RETRIES = 5;
 
     /**
      * Constrói uma instância do serviço SpotifyPlaylistGetter.
@@ -103,7 +108,7 @@ class SpotifyClient
      */
     protected function getAccessToken()
     {
-        return $this->cache->get('spotify_access_token', function (ItemInterface $item) {
+        return $this->cache->get(self::CACHE_ACCESS_TOKEN_KEY, function (ItemInterface $item) {
             $accessTokenInfo = $this->refreshAccessToken()->toArray();
             $item->expiresAfter($accessTokenInfo['expires_in']);
 
@@ -119,14 +124,17 @@ class SpotifyClient
      * @param string $url     A URL
      * @param array  $options Os dados e metadados da requisição
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function authenticatedRequest(string $method, string $url, array $options)
     {
-        return $this->httpClient->request($method, $url, array_merge($options, [
-            'headers' => [
-                'Authorization' => "Bearer {$this->getAccessToken()}",
-            ],
-        ]));
+        //TODO: implementar esta estratégia de backoff numa classe à parte
+        return Backoff(function () use ($method, $url, $options) {
+            return $this->httpClient->request($method, $url, array_merge($options, [
+                'headers' => [
+                    'Authorization' => "Bearer {$this->getAccessToken()}",
+                ],
+            ]));
+        }, self::MAX_RETRIES, 'exponential', 30000, true);
     }
 }

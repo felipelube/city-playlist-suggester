@@ -89,6 +89,9 @@
     "ralouphie/getallheaders": {
         "version": "3.0.3"
     },
+    "stechstudio/backoff": {
+        "version": "1.1"
+    },
     "symfony/cache": {
         "version": "v5.1.6"
     },
