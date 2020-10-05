@@ -68,4 +68,19 @@ class LocationTemperatureGetterTest extends KernelTestCase
         $temperature = $this->service->getTemperatureFromCityByLocation('20.2976', '40.2958');
         $this->assertTrue(\is_float($temperature));
     }
+
+    public function testInvalidCreation() {
+        $this->expectException(InvalidInputException::class);
+        $mockClient = $this->createMock(\Psr\Http\Client\ClientInterface::class);
+        $mockFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
+        new LocationTemperatureGetter("", $mockClient, $mockFactory, new ArrayAdapter());
+    }
+
+    public function testCityNotFound() {
+        $this->markTestIncomplete(
+            'Teste não implementado ainda.'
+          );
+    }
+
+
 }
