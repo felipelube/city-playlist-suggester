@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Exception\InvalidInputException;
 use App\Exception\NotFoundException;
-use App\Services\Normalizers\CityNameNormalizer;
 use Cmfcmf\OpenWeatherMap;
 use Cmfcmf\OpenWeatherMap\NotFoundException as OWMNotFoundException;
 use Psr\Http\Client\ClientInterface;
@@ -80,12 +79,9 @@ class LocationTemperatureGetter
                 throw new \InvalidArgumentException('getTemperatureFromCityByName: informe o nome da cidade');
             }
 
-            //FIXME: este normalizador deve ser utilizado no controller
-            $normalizedName = CityNameNormalizer::normalize($cityName);
-
-            return $this->cache->get("city-$normalizedName", function (ItemInterface $item) use ($normalizedName) {
-                $weather = Backoff(function () use ($normalizedName) {
-                    return $this->owm->getWeather($normalizedName, 'metric', 'pt_br');
+            return $this->cache->get("city-$cityName", function (ItemInterface $item) use ($cityName) {
+                $weather = Backoff(function () use ($cityName) {
+                    return $this->owm->getWeather($cityName, 'metric', 'pt_br');
                 }, self::MAX_RETRIES, 'exponential', 30000, true);
                 $item->expiresAfter(600); //TODO: parametrizar
 
