@@ -11,6 +11,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use STS\Backoff\Backoff;
 
 /**
  * Serviço para busca de temperatura utilizando a API do OpenWeatherMap (https://openweathermap.org/api).
@@ -45,6 +46,9 @@ class LocationTemperatureGetter
      *
      * @throws InvalidInputException
      */
+
+    public const MAX_RETRIES = 3;
+
     public function __construct(
         string $owmAppId,
         ClientInterface $httpClient,
@@ -83,7 +87,9 @@ class LocationTemperatureGetter
             $normalizedName = CityNameNormalizer::normalize($cityName);
 
             return $this->cache->get("city-$normalizedName", function (ItemInterface $item) use ($normalizedName) {
-                $weather = $this->owm->getWeather($normalizedName, 'metric', 'pt_br'); //TODO: parametrizar?
+                $weather = Backoff(function () use ($normalizedName) {
+                    return $this->owm->getWeather($normalizedName, 'metric', 'pt_br');
+                }, self::MAX_RETRIES, 'exponential', 30000, true);
                 $item->expiresAfter(600); //TODO: parametrizar
 
                 return $weather->temperature->now->getValue();
@@ -123,7 +129,9 @@ class LocationTemperatureGetter
             }
 
             return $this->cache->get("geo-$latitude, $longitude", function (ItemInterface $item) use ($latitude, $longitude) {
-                $weather = $this->owm->getWeather(['lat' => $latitude, 'lon' => $longitude], 'metric', 'pt_br');
+                $weather = Backoff(function () use ($latitude, $longitude) {
+                    return $this->owm->getWeather(['lat' => $latitude, 'lon' => $longitude], 'metric', 'pt_br');
+                }, self::MAX_RETRIES, 'exponential', 30000, true);
                 $item->expiresAfter(600); //TODO: parametrizar
 
                 return $weather->temperature->now->getValue();

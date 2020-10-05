@@ -128,7 +128,6 @@ class SpotifyClient
      */
     public function authenticatedRequest(string $method, string $url, array $options)
     {
-        //TODO: implementar esta estratégia de backoff numa classe à parte
         return Backoff(function () use ($method, $url, $options) {
             return $this->httpClient->request($method, $url, array_merge($options, [
                 'headers' => [
