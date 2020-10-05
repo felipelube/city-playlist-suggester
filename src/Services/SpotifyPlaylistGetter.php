@@ -53,7 +53,6 @@ class SpotifyPlaylistGetter
      */
     public function getPlaylistForGenre(string $genre)
     {
-        // TODO: usar uma resposta cacheada apenas como último recurso ou reduzir o TTL do cache
         return $this->cache->get("genre-$genre", function (ItemInterface $item) use ($genre) {
             $response = $this->spotifyClient->authenticatedRequest('GET', self::SPOTIFY_RECOMMENDATIONS_ENDPOINT, [
                 'query' => [
@@ -61,7 +60,7 @@ class SpotifyPlaylistGetter
                     'target_popularity' => 70,
                 ],
             ])->toArray();
-            $item->expiresAfter(3600); //TODO: parametrizar
+            $item->expiresAfter(600); //TODO: parametrizar
 
             // Transforma a resposta da API numa lista no formato Artista(s) - Título
             return array_map(function ($track) {
