@@ -39,10 +39,6 @@ abstract class PlaylistController extends AbstractController
         $genre = $this->musicGenreChooser::chooseGenreFromTemperature($temperature);
         $playlist = $this->playlistGetter->getPlaylistForGenre($genre);
 
-        return $this->json([
-            'temperatura' => $temperature,
-            'gênero musical' => $genre,
-            'playlist' => $playlist,
-        ]);
+        return $this->json($playlist);
     }
 }
