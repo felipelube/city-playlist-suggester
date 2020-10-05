@@ -66,3 +66,6 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+# Ignora arquivos de cobertura de testes
+coverage.html
+.vscode/
