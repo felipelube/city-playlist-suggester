@@ -1,0 +1,7 @@
+vendor
+tests
+var
+coverage.html
+bin
+.git
+.vscode
