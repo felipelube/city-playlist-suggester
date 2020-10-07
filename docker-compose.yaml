@@ -13,10 +13,11 @@ services:
     restart: always
     networks:
       - web
+      - internal
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.webapp.rule=Host(`$DOMAIN`)"
-
+      - "traefik.docker.network=web"
   reverse-proxy:
     image: "traefik:v2.2"
     restart: always
@@ -34,6 +35,13 @@ services:
       - "127.0.0.1:8090:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  cache:
+    image: "redis:6.0.8"
+    restart: always
+    container_name: cache
+    networks:
+      - internal
 
 networks:
   web:
