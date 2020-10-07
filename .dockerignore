@@ -5,3 +5,6 @@ coverage.html
 bin
 .git
 .vscode
+.env.prod
+.env.local
+.env.test
