@@ -18,10 +18,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.webapp.rule=Host(`$DOMAIN`)"
       - "traefik.docker.network=web"
+
   reverse-proxy:
     image: "traefik:v2.2"
     restart: always
-    container_name: "reverse_proxy"
     command:
       - "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -45,4 +45,6 @@ services:
 
 networks:
   web:
+    name: web
   internal:
+    name: internal
