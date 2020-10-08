@@ -15,8 +15,11 @@ COPY ./composer.* ./
 RUN set -ex; \
 apt-get update -qq; \
 apt-get install -y unzip libicu-dev;
-# Instale a extensão intl do PHP
-RUN docker-php-ext-install intl;
+# Instale a extensões para o PHP intl e redis
+RUN set -ex; \
+    pecl install redis-5.3.0; \
+    docker-php-ext-install intl; \
+    docker-php-ext-enable redis
 # Instale as dependências da aplicação
 RUN composer install --no-dev --optimize-autoloader
 # Faça o dump das variáveis de produção
