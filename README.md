@@ -2,7 +2,7 @@
 
 Este repositório é a implementação de um desafio proposto para uma vaga de emprego, conforme abaixo:
 
-> # Big Bang - Desafio Backend
+> # Desafio Backend
 >
 > Criar um micro-serviço que receba requisições HTTP no formato REST que receba como parâmetro o nome de uma cidade ou uma combinação de latitude e longitude e retorne uma sugestão de playlist (array com o título das músicas) de acordo com a temperatura atual da cidade.
 >
@@ -32,7 +32,7 @@ Este repositório é a implementação de um desafio proposto para uma vaga de e
 >
 > ## Submentendo a entrega
 >
-> Envie um email para thiago@bigbangdigital.com.br com o link para o código feito para cumprir o desafio (repositório público no GitHub/Gitlab/Gitbucket...)
+> Envie um email para REMOVIDO com o link para o código feito para cumprir o desafio (repositório público no GitHub/Gitlab/Gitbucket...)
 
 
 ## Rodando testes
